@@ -1,12 +1,9 @@
 #include "bt.h"
 #include "nvs_flash.h"
 
-#define LOG_LOCAL_LEVEL ESP_LOG_INFO
 #include "esp_log.h"
 
 static const char *tag = "MAIN";
-
-BT bt;
 
 extern "C" void app_main() {
     ESP_LOGI(tag, "Starting up...");
@@ -16,10 +13,12 @@ extern "C" void app_main() {
         ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK( ret );
-    if(bt.init()) {
+    if(BT::init()) {
         ESP_LOGI(tag, "Bluetooth initialized successfully.");
     } else {
         ESP_LOGE(tag, "Bluetooth could not be initialized.");
         return;
     }
+
+    BT::advertise(215, 650);
 }
