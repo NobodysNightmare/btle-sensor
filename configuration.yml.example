@@ -1,0 +1,9 @@
+sentry_dsn: ""
+sensors:
+  "12:34:56:78:90:AB":
+    name: "Test Sensor"
+    # Ignoring further readings by the same sensor for the
+    # given amount in seconds after receiving a reading.
+    # Allows for sensor to transmit each reading multiple times,
+    # before going to sleep again
+    duplicate_time: 10

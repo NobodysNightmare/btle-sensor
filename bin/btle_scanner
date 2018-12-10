@@ -1,0 +1,45 @@
+#!/usr/bin/env ruby
+root = File.expand_path('..', File.absolute_path(__dir__))
+$LOAD_PATH << "#{root}/lib"
+
+require 'btle_scanner'
+require 'btle_scanner/cli/options'
+require 'raven'
+require 'yaml'
+
+options = BtleScanner::Cli::Options.new
+options.parse!(ARGV)
+options.validate!
+
+configuration = YAML.load_file(options.config_file)
+sensors = configuration.fetch('sensors')
+
+Raven.configure do |config|
+  config.dsn = configuration['sentry_dsn']
+  config.logger.level = Logger::WARN
+end
+
+Raven.capture do
+  case options.mode
+  when :print
+    BtleScanner::SensorReadingService.new(sensors).each_reading do |mac, readings|
+      puts "#{mac} reports:"
+      puts "  Temperature: #{readings[:temperature]} °C"
+      puts "  Humidity: #{readings[:humidity]} °C"
+      puts
+    end
+  when :upload
+    BtleScanner::SensorReadingService.new(sensors).each_reading do
+      raise 'uploading not yet implemented'
+    end
+  when :discover
+    puts 'Searching for compatible devices...'
+    puts
+    BtleScanner::DiscoveryService.new.each_device do |mac, name|
+      local_name = sensors[mac]&.fetch('name')
+      puts "#{mac} - #{name || '(no device name)'} - #{local_name if local_name}"
+    end
+  else
+    raise "Unexpected mode '#{options[:mode]}'"
+  end
+end
