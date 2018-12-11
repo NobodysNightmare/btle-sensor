@@ -60,6 +60,11 @@ bool BT::init() {
     return true;
 }
 
+void BT::deinit() {
+    esp_bluedroid_disable();
+    esp_bt_controller_disable();
+}
+
 void BT::advertise(uint16_t temperature, uint16_t humidity) {
     uint8_t* stream = payload;
     UINT16_TO_STREAM(stream, 0xFFFF); // company ID

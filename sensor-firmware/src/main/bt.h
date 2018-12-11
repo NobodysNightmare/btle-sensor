@@ -5,5 +5,6 @@
 
 namespace BT {
     bool init();
+    void deinit();
     void advertise(uint16_t temperature, uint16_t humidity);
 };
