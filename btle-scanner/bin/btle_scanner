@@ -25,12 +25,15 @@ Raven.capture do
     BtleScanner::SensorReadingService.new(sensors).each_reading do |mac, readings|
       puts "#{mac} reports:"
       puts "  Temperature: #{readings[:temperature]} °C"
-      puts "  Humidity: #{readings[:humidity]} °C"
+      puts "  Humidity: #{readings[:humidity]} %"
       puts
     end
   when :upload
-    BtleScanner::SensorReadingService.new(sensors).each_reading do
-      raise 'uploading not yet implemented'
+    BtleScanner::SensorReadingService.new(sensors).each_reading do |mac, readings|
+      sensor = sensors.fetch(mac)
+      print "Uploading readings from #{sensors.fetch(mac).fetch('name')}... "
+      BtleScanner::HttpUploadService.new(sensor).upload(readings)
+      puts 'OK'
     end
   when :discover
     puts 'Searching for compatible devices...'

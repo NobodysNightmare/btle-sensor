@@ -31,8 +31,8 @@ module BtleScanner
         # TODO: use flags to determine available fields
         flags, temperature, humidity = own_data.unpack('CS<S<')
         yield(mac, {
-          temperature: temperature / 10.0,
-          humidity:    humidity / 10.0
+          temperature: temperature / 100.0,
+          humidity:    humidity / 100.0
         })
       end
     end
